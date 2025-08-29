@@ -8,6 +8,7 @@ This is a Next.js-based Task Manager Web Application developed with Next.js with
 - Node.js (v22.18.0 LTS or later)
 - `pnpm` (v10.x or higher)
 - MongoDB Atlas account (free tier)
+- Clerk account (free tier, https://clerk.com)
 
 ### Installation
 1. Clone the repository:
@@ -31,6 +32,14 @@ Create a `.env` file in the root directory with the following structure.
 
 DATABASE_URL="mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>?retryWrites=true&#x26;w=majority"</dbname></cluster></password></username>
 
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-publishable-key
+CLERK_SECRET_KEY=your-secret-key
+
+
+
 - Replace `<username>`, `<password>`, `<cluster>`, and `<dbname>` with your MongoDB Atlas credentials and database details.
 - Example: `DATABASE_URL="mongodb+srv://myuser:mypassword@cluster0.cdm5zue.mongodb.net/taskmanagerdb?retryWrites=true&w=majority"`
+- Note: Use URL-encoding for special characters in the password (e.g., `@` becomes `%40`).
+
+- Replace `your-publishable-key` and `your-secret-key` with values from your Clerk Dashboard (API Keys section).
 - Note: Use URL-encoding for special characters in the password (e.g., `@` becomes `%40`).
