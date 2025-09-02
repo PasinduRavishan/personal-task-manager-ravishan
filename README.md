@@ -19,13 +19,18 @@ cd personal-task-manager-ravishan
 
 pnpm install
 
-3. Set up environment variables (see `.env` structure below).
+3. Set up Prisma:
 
-4. Start the development server:
+pnpm prisma generate
+pnpm prisma db push
+
+4. Set up environment variables (see `.env` structure below).
+
+5. Start the development server:
 
 pnpm dev
 
-5. Open `http://localhost:3000` in your browser.
+6. Open `http://localhost:3000` in your browser.
 
 ### Environment Variables (`.env`)
 Create a `.env` file in the root directory with the following structure.
@@ -43,3 +48,4 @@ CLERK_SECRET_KEY=your-secret-key
 
 - Replace `your-publishable-key` and `your-secret-key` with values from your Clerk Dashboard (API Keys section).
 - Note: Use URL-encoding for special characters in the password (e.g., `@` becomes `%40`).
+
