@@ -5,10 +5,9 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "/api/webhooks(.*)",
+  "/api/webhooks(.*)", 
   "/api/health"
 ]);
-
 
 const isProtectedApiRoute = createRouteMatcher([
   "/api/tasks(.*)",
@@ -20,14 +19,14 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  
   const { userId } = await auth();
 
- 
+  
   if (isProtectedApiRoute(req)) {
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' },{ status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    return NextResponse.next(); 
   }
 
   
@@ -42,9 +41,9 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|public|health|api/webhooks|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Skip Next.js internals and static files
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
     // Always run for API routes
     '/(api|trpc)(.*)',
   ],
-}
+};

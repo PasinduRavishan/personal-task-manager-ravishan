@@ -12,7 +12,12 @@ const updateSchema = z.object({
 
 })
 
-export async function GET(req:NextRequest, {params}:{params:Promise<{id:string}>}){
+export interface TaskParams {
+  id: string;
+}
+
+
+export async function GET(req:NextRequest, {params}:{params:TaskParams}){
 
     try{
         const {userId} = await auth();
