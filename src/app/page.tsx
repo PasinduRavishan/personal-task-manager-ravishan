@@ -59,7 +59,7 @@ export default function Home() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-800 mb-8 max-w-2xl mx-auto leading-relaxed drop-shadow-md font-medium">
-              Transform your productivity with Scheduly - the elegant task management solution that keeps you focused and organized.
+              Transform your productivity with Scheduly - The elegant task management solution that keeps you focused and organized.
             </p>
           </div>
 
