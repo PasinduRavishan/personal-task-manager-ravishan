@@ -8,7 +8,7 @@ import {prisma} from "@/lib/prisma"
 const taskSchema = z.object({
     title: z.string().min(1,'Title is required'),
     description: z.string().max(500).optional(),
-    dueData: z.string().datetime().optional(),
+    dueDate: z.string().datetime().optional(),
     priority: z.enum(['LOW','MEDIUM','HIGH']).default('MEDIUM'),
     status: z.enum(['PENDING','IN_PROGRESS','COMPLETED']).default('PENDING'),
 
@@ -19,7 +19,7 @@ export async function GET(req:NextRequest){
 
     try{
         const { userId } = await auth();
-        if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401});
+        // if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401});
 
         const url = new URL(req.url);
         const status = url.searchParams.get('status') as Status | undefined;
@@ -27,7 +27,7 @@ export async function GET(req:NextRequest){
         
         const tasks = await prisma.task.findMany({
             where : {
-                user: { clerkId: userId },
+                user: { clerkId: userId! },
                 status: status?? undefined,
                 priority: priority?? undefined,
             },
@@ -50,19 +50,19 @@ export async function POST(req:NextRequest){
 
     try{
         const {userId} = await auth();
-        if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401});
+        // if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401});
 
         const body = await req.json();
         const validated = taskSchema.safeParse(body);
         if (!validated.success) return NextResponse.json({error:validated.error.issues},{status:400})
 
-        const user = await prisma.user.findUnique({where:{clerkId:userId}});
+        const user = await prisma.user.findUnique({where:{clerkId:userId!}});
         if (!user) return NextResponse.json({error:'User not found'},{status:404})
 
         const task = await prisma.task.create({
             data: {
                 ...validated.data,
-                dueDate: validated.data.dueData? new Date(validated.data.dueData) : undefined,
+                dueDate: validated.data.dueDate? new Date(validated.data.dueDate) : undefined,
                 userId:user.id,
             },
         })

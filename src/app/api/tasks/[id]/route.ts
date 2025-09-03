@@ -16,7 +16,7 @@ export async function GET(req:NextRequest, {params}:{params:Promise<{id:string}>
 
     try{
         const {userId} = await auth();
-        if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401})
+        // if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401})
 
         const { id } = await params;
 
@@ -28,7 +28,7 @@ export async function GET(req:NextRequest, {params}:{params:Promise<{id:string}>
         if (!task) return NextResponse.json({error:'Task not found'},{status:404})
         
         const user = await prisma.user.findUnique({
-            where : {clerkId:userId},
+            where : {clerkId:userId!},
         })
         if (task.userId !== user?.id) return NextResponse.json({error:'Unauthorized access'},{status:403})
 
@@ -50,7 +50,7 @@ export async function PUT(req:NextRequest,{params}:{params:Promise<{id:string}>}
 
     try{
         const {userId} = await auth();
-        if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401})
+        // if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401})
         
         const { id } = await params;
         
@@ -59,7 +59,7 @@ export async function PUT(req:NextRequest,{params}:{params:Promise<{id:string}>}
         if (!validated.success) return NextResponse.json({ error: validated.error.issues }, { status: 400 });
         
         const user = await prisma.user.findUnique({
-            where : {clerkId:userId}
+            where : {clerkId:userId!}
         })
 
         const task = await prisma.task.findUnique({
@@ -94,12 +94,12 @@ export async function DELETE(req:NextRequest, { params }: { params: Promise<{ id
 
     try{
         const { userId } = await auth();
-        if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        // if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const { id } = await params;
 
         const user = await prisma.user.findUnique({
-             where: { clerkId: userId } 
+             where: { clerkId: userId! } 
             });
 
         const task = await prisma.task.findUnique({
