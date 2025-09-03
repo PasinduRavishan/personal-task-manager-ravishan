@@ -6,7 +6,7 @@ import z from "zod";
 const updateSchema = z.object({
     title: z.string().min(1).max(100).optional(),
     description: z.string().max(500).optional(),
-    dueDate: z.string().datetime().optional(),
+    dueDate: z.string().optional().transform(val => val && val.trim() !== "" ? new Date(val) : undefined),
     priority: z.enum(['LOW','MEDIUM','HIGH']).optional(),
     status: z.enum(['PENDING','IN_PROGRESS','COMPLETED']).optional(),
 
@@ -55,7 +55,7 @@ export async function PUT(req:NextRequest,{params}:{params:Promise<{id:string}>}
 
     try{
         const {userId} = await auth();
-        // if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401})
+        if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401})
         
         const { id } = await params;
         
@@ -77,8 +77,6 @@ export async function PUT(req:NextRequest,{params}:{params:Promise<{id:string}>}
             where : {id},
             data:{
                 ...validated.data,
-                dueDate: validated.data.dueDate ? new Date(validated.data.dueDate) : undefined,
-
             }
         })
 
