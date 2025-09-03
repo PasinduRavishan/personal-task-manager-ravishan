@@ -39,6 +39,7 @@ DATABASE_URL="mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>
 
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-publishable-key
 CLERK_SECRET_KEY=your-secret-key
+CLERK_WEBHOOK_SECRET_KEY=your-webhook-secret-key
 
 
 
@@ -48,4 +49,29 @@ CLERK_SECRET_KEY=your-secret-key
 
 - Replace `your-publishable-key` and `your-secret-key` with values from your Clerk Dashboard (API Keys section).
 - Note: Use URL-encoding for special characters in the password (e.g., `@` becomes `%40`).
+- Add CLERK_WEBHOOK_SECRET_KEY from Clerk’s Webhooks section to handle user lifecycle events.
 
+### Usage
+
+- Log in with Clerk authentication to access the task manager dashboard.
+- Use the form to create tasks with title, description, due date, priority, and status.
+- View and delete tasks from the task list.
+- Updates are handled via API routes at /api/tasks/[id].
+
+### Project Structure
+
+- app/: Next.js App Router files (e.g., dashboard/page.tsx, layout.tsx).
+- app/api/: API routes for tasks (e.g., route.ts, [id]/route.ts).
+- components/ui/: shadcn/ui components (e.g., button.tsx, card.tsx).
+- lib/: Utility files (e.g., prisma.ts).
+- prisma/: Prisma schema and migration files.
+
+### Dependencies
+
+- Next.js: App Router and Server Actions.
+- Prisma: ORM with MongoDB integration.
+- Tailwind CSS: Utility-first styling framework.
+- shadcn/ui: Customizable UI components.
+- Clerk: Authentication and user management.
+- pnpm: Package manager.
+- zod: Schema validation.
