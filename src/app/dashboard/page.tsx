@@ -2,6 +2,7 @@
 
 import {TaskForm} from "../../components/TaskForm";
 import TaskList from "../../components/TaskList";
+import TaskFilter from "../../components/TaskFilter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { useAuth, UserButton } from "@clerk/nextjs";
@@ -10,27 +11,28 @@ import Navbar from "@/components/Navbar";
 export default function Dashboard() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [userSynced, setUserSynced] = useState(false);
+  const [filters, setFilters] = useState<{ status?: string; priority?: string }>({});
   const { isLoaded, isSignedIn } = useAuth();
 
   // Sync user on load
   useEffect(() => {
-    console.log("🚀 [Dashboard] Starting user sync and task fetch");
+    // console.log("[Dashboard] Starting user sync and task fetch");
     const syncUser = async () => {
       try {
-        console.log("📡 [Dashboard] Calling sync-user API");
+        // console.log("[Dashboard] Calling sync-user API");
         const syncResponse = await fetch('/api/sync-user', { method: 'POST' });
         const syncResult = await syncResponse.json();
-        console.log("✅ [Dashboard] Sync result:", syncResult);
+        // console.log("Dashboard] Sync result:", syncResult);
         
         if (syncResponse.ok) {
-          console.log("📋 [Dashboard] User sync successful, triggering task refresh");
+          // console.log("[Dashboard] User sync successful, triggering task refresh");
           // Trigger TaskList refresh
           setRefreshTrigger(prev => prev + 1);
         } else {
-          console.error("❌ [Dashboard] Sync failed:", syncResult);
+          console.error("[Dashboard] Sync failed:", syncResult);
         }
       } catch (error) {
-        console.error("❌ [Dashboard] Sync error:", error);
+        console.error("[Dashboard] Sync error:", error);
       }
     };
 
@@ -45,6 +47,10 @@ export default function Dashboard() {
   const handleTaskDeleted = () => {
     // Trigger task list refresh
     setRefreshTrigger(prev => prev + 1);
+  };
+
+  const handleFilterChange = (newFilters: { status?: string; priority?: string }) => {
+    setFilters(newFilters);
   };
 
   if (!isLoaded) {
@@ -128,6 +134,9 @@ export default function Dashboard() {
 
           {/* Right Column - Task List (Main Content) */}
           <div className="lg:col-span-2">
+            {/* Filter Component */}
+            <TaskFilter onFilterChange={handleFilterChange} activeFilters={filters} />
+            
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center">
@@ -140,7 +149,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="p-6">
-                <TaskList refreshTrigger={refreshTrigger} onTaskDeleted={handleTaskDeleted} />
+                <TaskList refreshTrigger={refreshTrigger} onTaskDeleted={handleTaskDeleted} filters={filters} />
               </div>
             </div>
           </div>

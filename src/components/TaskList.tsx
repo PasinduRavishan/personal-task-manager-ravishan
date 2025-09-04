@@ -22,9 +22,10 @@ interface Task {
 interface TaskListProps {
   refreshTrigger?: number;
   onTaskDeleted?: () => void;
+  filters?: { status?: string; priority?: string };
 }
 
-export default function TaskList({ refreshTrigger, onTaskDeleted }: TaskListProps) {
+export default function TaskList({ refreshTrigger, onTaskDeleted, filters }: TaskListProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,29 +34,42 @@ export default function TaskList({ refreshTrigger, onTaskDeleted }: TaskListProp
 
   const fetchTasks = async () => {
     try {
-      console.log("🔍 [TaskList] Starting to fetch tasks");
+      // console.log("[TaskList] Starting to fetch tasks with filters:", filters);
       setLoading(true);
-      const response = await fetch('/api/tasks');
       
-      console.log("🔍 [TaskList] API response status:", response.status);
+      
+      const queryParams = new URLSearchParams();
+      if (filters?.status) {
+        queryParams.append('status', filters.status);
+      }
+      if (filters?.priority) {
+        queryParams.append('priority', filters.priority);
+      }
+      
+      const url = `/api/tasks${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      // console.log("[TaskList] Fetching from URL:", url);
+      
+      const response = await fetch(url);
+      
+      // console.log("[TaskList] API response status:", response.status);
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.log("❌ [TaskList] API error response:", errorText);
+        console.log("[TaskList] API error response:", errorText);
         // throw new Error(`Failed to fetch tasks: ${response.status}`);
       }
       
       const result = await response.json();
-      console.log("✅ [TaskList] API response data:", result);
+      console.log("[TaskList] API response data:", result);
       
       // Handle both result.tasks and result.data formats
       const tasksData = result.tasks || result.data || [];
-      console.log("📋 [TaskList] Setting tasks:", tasksData.length, "tasks");
+      console.log("[TaskList] Setting tasks:", tasksData.length, "tasks");
       
       setTasks(tasksData);
       setError(null);
     } catch (err) {
-      console.error('❌ [TaskList] Error fetching tasks:', err);
+      console.error('[TaskList] Error fetching tasks:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch tasks');
     } finally {
       setLoading(false);
@@ -69,33 +83,33 @@ export default function TaskList({ refreshTrigger, onTaskDeleted }: TaskListProp
       setLoading(false);
       setTasks([]);
     }
-  }, [isLoaded, isSignedIn, refreshTrigger]);
+  }, [isLoaded, isSignedIn, refreshTrigger, filters]);
 
-  // Refresh tasks when a task is deleted
+  
   const handleTaskDeleted = () => {
     fetchTasks();
-    // Call parent callback if provided
+    
     if (onTaskDeleted) {
       onTaskDeleted();
     }
   };
 
-  // Handle task updated
+  
   const handleTaskUpdated = () => {
-    setEditingTaskId(null); // Exit edit mode
-    fetchTasks(); // Refresh the list
-    // Call parent callback if provided
-    if (onTaskDeleted) { // Using the same callback for now
+    setEditingTaskId(null); 
+    fetchTasks(); 
+    
+    if (onTaskDeleted) { 
       onTaskDeleted();
     }
   };
 
-  // Handle edit button click
+ 
   const handleEditClick = (taskId: string) => {
     setEditingTaskId(taskId);
   };
 
-  // Handle cancel edit
+  
   const handleCancelEdit = () => {
     setEditingTaskId(null);
   };

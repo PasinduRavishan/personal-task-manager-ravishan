@@ -15,43 +15,54 @@ const taskSchema = z.object({
 
 })
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const { userId } = await auth();
     // console.log("[GET /api/tasks] User ID from Clerk:", userId);
 
     if (!userId) {
-    //   console.log("[GET /api/tasks] No user ID found");
+    //   console.log("[GET /api/tasks] No user ID found catched from route file");
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Find user in database
+    
+    const { searchParams } = new URL(req.url);
+    const statusFilter = searchParams.get('status');
+    const priorityFilter = searchParams.get('priority');
+
+    
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
-      include: { tasks: true }
     });
 
     // console.log("[GET /api/tasks] Database lookup result:", {
     //   userFound: !!user,
     //   userId: user?.id,
     //   clerkId: user?.clerkId,
-    //   tasksCount: user?.tasks?.length || 0
     // });
 
     if (!user) {
-    //   console.log("[GET /api/tasks] User not found in database with clerkId:", userId);
-      
-      // Let's also check if any users exist at all
-      const allUsers = await prisma.user.findMany({
-        select: { id: true, clerkId: true, email: true, createdAt: true }
-      });
-    //   console.log("[GET /api/tasks] All users in database:", allUsers);
-      
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // console.log("[GET /api/tasks] User found:", user.id, "Tasks count:", user.tasks.length);
-    return NextResponse.json({ tasks: user.tasks });
+    
+    const filters: any = { userId: user.id };
+    
+    if (statusFilter && ['PENDING', 'IN_PROGRESS', 'COMPLETED'].includes(statusFilter)) {
+      filters.status = statusFilter as Status;
+    }
+    
+    if (priorityFilter && ['LOW', 'MEDIUM', 'HIGH'].includes(priorityFilter)) {
+      filters.priority = priorityFilter as Priority;
+    }
+
+    const tasks = await prisma.task.findMany({
+      where: filters,
+      orderBy: { createdAt: 'desc' }
+    });
+
+    // console.log("[GET /api/tasks] User found:", user.id, "Tasks count:", tasks.length, "Filters:", filters);
+    return NextResponse.json({ tasks });
   } catch (error) {
     // console.error("[GET /api/tasks] Error:", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -63,7 +74,7 @@ export async function POST(req:NextRequest){
     try{
         const {userId} = await auth();
         
-        if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401});
+        // if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401});
 
         const body = await req.json();
         const validated = taskSchema.safeParse(body);
