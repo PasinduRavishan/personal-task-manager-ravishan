@@ -6,7 +6,7 @@ export async function GET() {
   if (!userId) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 
   const token = await getToken();
-  console.log("Clerk JWT:", token);
+  
 
   return NextResponse.json({ userId, token });
 }
