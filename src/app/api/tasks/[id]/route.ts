@@ -23,7 +23,7 @@ export async function GET(req:NextRequest, {params}:{params:TaskParams}){
         const {userId} = await auth();
         // if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401})
 
-        const { id } = await params;
+        const { id } = params;
 
         const task = await prisma.task.findUnique({
             where:{id},
@@ -51,13 +51,13 @@ export async function GET(req:NextRequest, {params}:{params:TaskParams}){
 }
 
 
-export async function PUT(req:NextRequest,{params}:{params:Promise<{id:string}>}){
+export async function PUT(req:NextRequest,{params}:{params:TaskParams}){
 
     try{
         const {userId} = await auth();
         if (!userId) return NextResponse.json({error:'Unauthorized'},{status:401})
         
-        const { id } = await params;
+        const { id } = params;
         
         const body = await req.json();
         const validated = updateSchema.safeParse(body);
@@ -93,13 +93,13 @@ export async function PUT(req:NextRequest,{params}:{params:Promise<{id:string}>}
   }
 }
 
-export async function DELETE(req:NextRequest, { params }: { params: Promise<{ id: string }> }){
+export async function DELETE(req:NextRequest, { params }: { params:TaskParams}){
 
     try{
         const { userId } = await auth();
         // if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const { id } = await params;
+        const { id } = params;
 
         const user = await prisma.user.findUnique({
              where: { clerkId: userId! } 
